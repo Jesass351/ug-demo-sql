@@ -2,7 +2,6 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY ./app/requirements.txt .
 RUN pip install flask==2.0.1 mysql-connector-python==8.0.26
 
 COPY ./app .
