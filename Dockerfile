@@ -10,4 +10,4 @@ RUN pip install waitress
 
 COPY ./app .
 
-CMD waitress-serve --host 0.0.0.0 --port 8000 app:app
+CMD waitress-serve --host 0.0.0.0 --port 80 app:app
