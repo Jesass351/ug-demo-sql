@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        form { margin: 20px 0; }
+        input[type="text"] { padding: 8px; width: 300px; }
+        input[type="submit"], button { 
+            padding: 8px 15px; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            margin-right: 10px;
+        }
+        .search-btn { background-color: #4CAF50; }
+        .search-btn:hover { background-color: #45a049; }
+        .init-db-btn { background-color: #f44336; }
+        .init-db-btn:hover { background-color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <h1>SQL Injection Demo</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" action="{{ url_for('index') }}">
+        <label for="search">Поиск пользователя:</label>
+        <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="Введите имя пользователя">
+        <input type="submit" class="search-btn" value="Найти">
+    </form>
+    
+    <form method="POST" action="{{ url_for('initialize_db') }}">
+        <button type="submit" class="init-db-btn">Инициализировать БД</button>
+    </form>
+    
+    {% if users %}
+        <h2>Результаты поиска:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>Пароль</th>
+                    <th>Email</th>
+                    <th>Админ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.password }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ 'Да' if user.is_admin else 'Нет' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    
+    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-left: 5px solid #ffc107;">
+        <p>Запрос имеет вид: <code>SELECT * FROM users WHERE username = '{search_query}'</code></p>
+        <h3>Примеры:</h3>
+        <ul>
+            <li><code>' OR '1'='1</code> - покажет всех пользователей</li>
+            <li><code>' UNION SELECT 1, username, password, email, 1 FROM users WHERE '1'='1</code> - покажет поля всех пользователей</li>
+            <li><code>'; DROP TABLE users;</code> - дроп всей таблицы</li>
+        </ul>
+    </div>
+</body>
+</html>
